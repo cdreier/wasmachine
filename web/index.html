@@ -1,0 +1,34 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+      go.run(result.instance);
+    });
+  </script>
+  <script src="wasmachine.js"></script>
+</head>
+
+<body>
+
+  <button id="testpost">POST</button>
+
+  <script>
+    document.getElementById("testpost").addEventListener("click", () => {
+      fetch("/api/yo?q=yooo", {
+        method: "POST",
+        body: JSON.stringify({
+          bigData: "in the body!"
+        }),
+        headers: { "test": "asdf" }
+      })
+        .then(r => r.text())
+        .then(console.log)
+    })
+  </script>
+</body>
+
+</html>
