@@ -2,6 +2,7 @@ package wasmachine
 
 import (
 	"bytes"
+	"encoding/base64"
 	"mime"
 	"net/http"
 	"strings"
@@ -84,7 +85,13 @@ func (w *ResponseWriter) CloseNotify() <-chan bool {
 // End the request.
 func (w *ResponseWriter) End() FetchResponse {
 
-	w.out.Body = w.buf.String()
+	isBinary := isBinary(w.header)
+
+	if isBinary {
+		w.out.Body = base64.StdEncoding.EncodeToString(w.buf.Bytes())
+	} else {
+		w.out.Body = w.buf.String()
+	}
 
 	// notify end
 	w.closeNotifyCh <- true

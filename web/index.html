@@ -14,11 +14,35 @@
 
 <body>
 
-  <button id="testpost">POST</button>
+  <input type="file" id="image">
+
+  <button id="testpost">TEST POST</button>
+
 
   <script>
+
+    const upload = (file) => {
+      fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          "Content-Type": file.type
+        },
+        body: file
+      }).then(
+        response => response.text()
+      ).then(
+        success => console.log(success) // Handle the success response object
+      ).catch(
+        error => console.log(error) // Handle the error response object
+      );
+    };
+
+    const input = document.getElementById("image")
+    const onSelectFile = () => upload(input.files[0]);
+    input.addEventListener('change', onSelectFile, false)
+
     document.getElementById("testpost").addEventListener("click", () => {
-      fetch("/api/yo?q=yooo", {
+      fetch("/api/debug?q=yooo", {
         method: "POST",
         body: JSON.stringify({
           bigData: "in the body!"
