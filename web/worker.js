@@ -28,12 +28,12 @@ self.addEventListener('message', msg => {
 const serializeRequest = async (req, fetchID) => {
   // TODO: perhaps we need to check the body 
   // https://developer.mozilla.org/en-US/docs/Web/API/Request#Methods
-  const body = await req.text()
+  const body = await req.arrayBuffer()
   const r = {
     cache: req.cache,
     credentials: req.credentials,
     destination: req.destination,
-    headers: new Map(req.headers),
+    headers: Object.fromEntries(req.headers),
     integrity: req.integrity,
     isHistoryNavigation: req.isHistoryNavigation,
     keepalive: req.keepalive,
@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
         self.requestBuffer[fetchID] = {
           done: resolve,
         }
-      })
+      }).catch(err => console.log(err))
     )
   }
 });

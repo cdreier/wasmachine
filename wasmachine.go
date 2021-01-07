@@ -2,6 +2,7 @@ package wasmachine
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"syscall/js"
 )
@@ -9,9 +10,16 @@ import (
 func ListenAndServe(addr string, h http.Handler) error {
 	cb := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		payload := args[0].Get("detail")
+
+		// test := make([]byte, 0)
+		// fmt.Println("JS payload: ", payload.Call("toString"))
+		// bytesCopied := js.CopyBytesToGo(test, payload)
 		jsReq := payload.Get("req").String()
 		var freq FetchRequest
-		json.Unmarshal([]byte(jsReq), &freq)
+		err := json.Unmarshal([]byte(jsReq), &freq)
+		if err != nil {
+			log.Println("error during req deserialization: ", err)
+		}
 
 		r, _ := NewRequest(freq)
 		w := NewResponse(freq.FetchID)

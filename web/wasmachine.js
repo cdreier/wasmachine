@@ -13,7 +13,7 @@ class Wasmachine {
   onMessage(evt) {
     switch (event.data.type) {
       case "fetch":
-        this.request(JSON.stringify(event.data.req))
+        this.request(event.data.req)
         break
       default:
         console.log(`JS: unhandled message received: ${event.data}`);
@@ -21,9 +21,13 @@ class Wasmachine {
   }
 
   request(req) {
+    const requestDetail = Object.assign({}, req, {
+      body: Array.from(new Uint8Array(req.body)),
+    })
+
     document.dispatchEvent(new CustomEvent("request", {
       detail: {
-        req,
+        req: JSON.stringify(requestDetail),
       }
     }))
   }

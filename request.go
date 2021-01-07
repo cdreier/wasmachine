@@ -1,10 +1,10 @@
 package wasmachine
 
 import (
+	"bytes"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -23,7 +23,7 @@ type FetchRequest struct {
 	Referrer            string            `json:"referrer"`
 	ReferrerPolicy      string            `json:"referrerPolicy"`
 	URL                 string            `json:"url"`
-	Body                string            `json:"body"`
+	Body                []byte            `json:"body"`
 	FetchID             string            `json:"fetchID"`
 }
 
@@ -41,7 +41,7 @@ func NewRequest(fr FetchRequest) (*http.Request, error) {
 	body := fr.Body
 
 	// new request
-	req, err := http.NewRequest(fr.Method, u.String(), strings.NewReader(body))
+	req, err := http.NewRequest(fr.Method, u.String(), bytes.NewReader(body))
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
@@ -59,7 +59,7 @@ func NewRequest(fr FetchRequest) (*http.Request, error) {
 	}
 
 	// content-length
-	if req.Header.Get("Content-Length") == "" && body != "" {
+	if req.Header.Get("Content-Length") == "" && len(body) > 0 {
 		req.Header.Set("Content-Length", strconv.Itoa(len(body)))
 	}
 
