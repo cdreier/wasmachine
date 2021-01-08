@@ -10,6 +10,7 @@ import (
 
 type FetchResponse struct {
 	Body       string            `json:"body"`
+	IsBinary   bool              `json:"isBinary"`
 	FetchID    string            `json:"fetchID"`
 	StatusCode int               `json:"statusCode"`
 	Headers    map[string]string `json:"headers"`
@@ -85,9 +86,9 @@ func (w *ResponseWriter) CloseNotify() <-chan bool {
 // End the request.
 func (w *ResponseWriter) End() FetchResponse {
 
-	isBinary := isBinary(w.header)
+	w.out.IsBinary = isBinary(w.header)
 
-	if isBinary {
+	if w.out.IsBinary {
 		w.out.Body = base64.StdEncoding.EncodeToString(w.buf.Bytes())
 	} else {
 		w.out.Body = w.buf.String()

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	_ "image/png"
+	"image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,17 +30,16 @@ func main() {
 			log.Println("err in read body ", err)
 		}
 
-		img, format, err := image.Decode(bytes.NewReader(b))
+		img, _, err := image.Decode(bytes.NewReader(b))
 
 		if err != nil {
-			log.Println(err, format)
+			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		log.Println(img.Bounds(), format)
-
-		w.Write([]byte("upload endpoint"))
+		w.Header().Set("Content-Type", "image/png")
+		png.Encode(w, img)
 	})
 
 	r.Post("/api/debug", func(w http.ResponseWriter, r *http.Request) {

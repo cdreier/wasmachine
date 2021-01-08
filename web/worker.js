@@ -15,7 +15,10 @@ self.addEventListener('message', msg => {
       Object.keys(res.headers).forEach(k => {
         headers.append(k, res.headers[k])
       })
-      done(new Response(res.body, {
+
+      const responseBody = res.isBinary ? parseBinaryResponse(res.body) : res.body
+
+      done(new Response(responseBody, {
         status: res.statusCode,
         headers,
       }))
@@ -24,6 +27,17 @@ self.addEventListener('message', msg => {
       break;
   }
 });
+
+const parseBinaryResponse = (res) => {
+  const byteChars = atob(res)
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNumbers[i] = byteChars.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray]);
+  return blob
+}
 
 const serializeRequest = async (req, fetchID) => {
   // TODO: perhaps we need to check the body 

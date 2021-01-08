@@ -18,6 +18,9 @@
 
   <button id="testpost">TEST POST</button>
 
+  <br>
+  <img id="testimg" alt="testimg" />
+
 
   <script>
 
@@ -28,18 +31,22 @@
           "Content-Type": file.type
         },
         body: file
-      }).then(
-        response => response.text()
-      ).then(
-        success => console.log(success) // Handle the success response object
-      ).catch(
-        error => console.log(error) // Handle the error response object
-      );
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.blob()
+        })
+        .then(success => {
+          const imageUrl = URL.createObjectURL(success)
+          document.getElementById("testimg").src = imageUrl
+        })
+        .catch(error => console.log(error));
     };
 
     const input = document.getElementById("image")
-    const onSelectFile = () => upload(input.files[0]);
-    input.addEventListener('change', onSelectFile, false)
+    input.addEventListener('change', () => upload(input.files[0]), false)
 
     document.getElementById("testpost").addEventListener("click", () => {
       fetch("/api/debug?q=yooo", {
