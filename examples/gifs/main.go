@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
+	_ "image/jpeg"
 	"image/png"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,14 +17,26 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
+var images []image.Image
+
 func main() {
+
+	images = make([]image.Image, 0)
 
 	r := chi.NewRouter()
 
 	r.Use(middleware.Recoverer)
 
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("TEST GET from wasm"))
+	r.Get("/api/generate", func(w http.ResponseWriter, r *http.Request) {
+
+		// TODO
+
+		if len(images) > 0 {
+			w.Header().Add("Content-Type", "image/png")
+			png.Encode(w, images[0])
+			return
+		}
+
 	})
 
 	r.Post("/api/upload", func(w http.ResponseWriter, r *http.Request) {
@@ -38,16 +53,9 @@ func main() {
 			return
 		}
 
-		w.Header().Set("Content-Type", "image/png")
-		png.Encode(w, img)
-	})
+		images = append(images, img)
 
-	r.Post("/api/debug", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Println("err in read body ", err)
-		}
-		w.Write([]byte(fmt.Sprintf("TEST POST from wasm: %s", string(b))))
+		json.NewEncoder(w).Encode(images)
 	})
 
 	if err := wasmachine.ListenAndServe(":1234", r); err != nil {

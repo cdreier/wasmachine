@@ -1,6 +1,10 @@
 # wasmachine
 
-use your golang http router locally as webassembly
+use your golang http router locally as webassembly.
+
+## Examples
+
+the build targets in the Makefile, builds the examples and copies everything needed in the `web` folder. Now just start a simple webserver with the `web` folder as root, and you are good to go!
 
 ## HOW???
 

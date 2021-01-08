@@ -15,11 +15,13 @@
 <body>
 
   <input type="file" id="image">
-
-  <button id="testpost">TEST POST</button>
+  <br>
+  <pre id="out"></pre>
+  <br>
+  <button id="run">to GIF!</button>
 
   <br>
-  <img id="testimg" alt="testimg" />
+  <img id="result" alt="result" />
 
 
   <script>
@@ -36,29 +38,34 @@
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
-          return response.blob()
+          return response.json()
         })
-        .then(success => {
-          const imageUrl = URL.createObjectURL(success)
-          document.getElementById("testimg").src = imageUrl
+        .then(r => {
+          document.getElementById("out").innerText = JSON.stringify(r, null, " ")
         })
         .catch(error => console.log(error));
     };
 
+    const generate = () => {
+      fetch('/api/generate')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.blob()
+        })
+        .then(success => {
+          const imageUrl = URL.createObjectURL(success)
+          document.getElementById("result").src = imageUrl
+        })
+        .catch(error => console.log(error));
+    }
+
     const input = document.getElementById("image")
     input.addEventListener('change', () => upload(input.files[0]), false)
 
-    document.getElementById("testpost").addEventListener("click", () => {
-      fetch("/api/debug?q=yooo", {
-        method: "POST",
-        body: JSON.stringify({
-          bigData: "in the body!"
-        }),
-        headers: { "test": "asdf" }
-      })
-        .then(r => r.text())
-        .then(console.log)
-    })
+    document.getElementById("run").addEventListener("click", () => generate())
+
   </script>
 </body>
 
