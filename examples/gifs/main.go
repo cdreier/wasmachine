@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
-	_ "image/jpeg"
-	"image/png"
-	_ "image/png"
+	"image/gif"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -17,11 +15,11 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
-var images []image.Image
+var frames []*image.Paletted
 
 func main() {
 
-	images = make([]image.Image, 0)
+	frames = make([]*image.Paletted, 0)
 
 	r := chi.NewRouter()
 
@@ -29,13 +27,21 @@ func main() {
 
 	r.Get("/api/generate", func(w http.ResponseWriter, r *http.Request) {
 
-		// TODO
+		delays := make([]int, len(frames))
+		for i := range frames {
+			delays[i] = 0
+		}
 
-		if len(images) > 0 {
-			w.Header().Add("Content-Type", "image/png")
-			png.Encode(w, images[0])
+		if len(frames) > 0 {
+			w.Header().Add("Content-Type", "image/gif")
+			gif.EncodeAll(w, &gif.GIF{
+				Image: frames,
+				Delay: delays,
+			})
 			return
 		}
+
+		w.Write([]byte("nothing to do..."))
 
 	})
 
@@ -45,7 +51,7 @@ func main() {
 			log.Println("err in read body ", err)
 		}
 
-		img, _, err := image.Decode(bytes.NewReader(b))
+		img, err := gif.DecodeAll(bytes.NewReader(b))
 
 		if err != nil {
 			log.Println(err)
@@ -53,9 +59,13 @@ func main() {
 			return
 		}
 
-		images = append(images, img)
+		frames = append(frames, img.Image...)
 
-		json.NewEncoder(w).Encode(images)
+		json.NewEncoder(w).Encode(struct {
+			Frames int `json:"frames,omitempty"`
+		}{
+			Frames: len(frames),
+		})
 	})
 
 	if err := wasmachine.ListenAndServe(":1234", r); err != nil {
