@@ -87,7 +87,7 @@ if err := wasmachine.ListenAndServe(":1234", r); err != nil {
 }
 ```
 
-The port is only there for the feeling.
+The port is only there for the *feeling*.
 
 When we put everything together, we see that we need to store the request somewhere in the service worker to answer it after our go wasmachine handled everything. This was a bit tricky. Luckily we can respond with a `Promise`! 
 
@@ -127,10 +127,12 @@ done(new Response(res.body, {
 }))
 ```
 
+The solution for binary payloads and responses is the same as AWS is doing it - pack everything in a base64 string and unpack it on the receiver.
+
 ## WHY???
 
 I DONT KNOW - Y U YELLING AT ME
 
 Perhaps we can concat gifs... or do something cool with a [SingleHostReverseProxy](https://golang.org/pkg/net/http/httputil/#NewSingleHostReverseProxy)?
 
-This is just the beginning ;) 
+This is just the beginning! ;) 
