@@ -14,19 +14,39 @@
 
 <body>
 
+  <h1>Gif Tools!</h1>
+  <p>
+    This is a small online tool whre you can upload multiple gifs (no drag & drop, just select one after another).
+    <br>
+    The cool thing: nothing is actually uploaded to a server, everything is handled right in your browser!
+    <br>
+    Please find more infos on github: <a href="https://github.com/cdreier/wasmachine">https://github.com/cdreier/wasmachine</a>
+  </p>
+  <br>
   <input type="file" id="image">
   <br>
   <pre id="out"></pre>
   <br>
-  <button id="run">to GIF!</button>
+  <label>
+    reverse
+    <input type="checkbox" id="reverse">
+  </label>
+  <button id="run">render!</button>
 
   <br>
-  <img id="result" alt="result" />
+  <br>
+  <img id="result" alt="result" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=" />
 
 
   <script>
 
     const upload = (file) => {
+
+      if (file.type != "image/gif") {
+        alert("only gifs please")
+        return
+      }
+
       fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -47,7 +67,7 @@
     };
 
     const generate = () => {
-      fetch('/api/generate')
+      fetch('/api/generate?reverse=' + document.getElementById("reverse").checked)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');

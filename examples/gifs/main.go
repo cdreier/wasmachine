@@ -27,15 +27,28 @@ func main() {
 
 	r.Get("/api/generate", func(w http.ResponseWriter, r *http.Request) {
 
+		reverse := r.URL.Query().Get("reverse") == "true"
+
+		// create frames, check reverse flag
+		framesToEncode := frames
+		if reverse {
+			for i := len(framesToEncode)/2 - 1; i >= 0; i-- {
+				opp := len(framesToEncode) - 1 - i
+				framesToEncode[i], framesToEncode[opp] = framesToEncode[opp], framesToEncode[i]
+			}
+		}
+
+		// make delay between every single frame
 		delays := make([]int, len(frames))
 		for i := range frames {
 			delays[i] = 0
 		}
 
+		// encode gif and write it to response
 		if len(frames) > 0 {
 			w.Header().Add("Content-Type", "image/gif")
 			gif.EncodeAll(w, &gif.GIF{
-				Image: frames,
+				Image: framesToEncode,
 				Delay: delays,
 			})
 			return
