@@ -1,10 +1,18 @@
 # wasmachine
 
-use your golang http router locally as webassembly.
+use your golang http router in webassembly.
+
+It's as easy as 
+
+1. code: `wasmachine.ListenAndServe(":1234", yourHTTPRouter)`
+2. build: `GOOS=js GOARCH=wasm go build -o main.wasm`
+3. ... adding a bunch of javascripts beside the wasm ;) 
 
 ## Examples
 
-the build targets in the Makefile, builds the examples and copies everything needed in the `web` folder. Now just start a simple webserver with the `web` folder as root, and you are good to go!
+the targets in the Makefile are building the examples and copies everything needed in the `web` folder. Now just start a simple webserver with the `web` folder as root, and you are good to go!
+
+You can find the gif demo running [here](https://drailing.net/demos/wasmachine/)!
 
 ## HOW???
 
@@ -123,3 +131,6 @@ done(new Response(res.body, {
 
 I DONT KNOW - Y U YELLING AT ME
 
+Perhaps we can concat gifs... or do something cool with a [SingleHostReverseProxy](https://golang.org/pkg/net/http/httputil/#NewSingleHostReverseProxy)?
+
+This is just the beginning ;) 
