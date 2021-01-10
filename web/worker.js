@@ -2,6 +2,11 @@ self.addEventListener('install', msg => {
   self.skipWaiting()
   self.requestBuffer = {}
 })
+
+addEventListener('activate', event => {
+  self.clients.claim()
+});
+
 self.addEventListener('message', msg => {
 
   switch (msg.data.type) {
