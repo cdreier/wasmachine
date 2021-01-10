@@ -4,9 +4,6 @@ class Wasmachine {
 
   constructor(registration) {
     this.registration = registration
-    this.registration.active.postMessage({
-      type: "init"
-    });
     navigator.serviceWorker.addEventListener('message', event => this.onMessage(event));
   }
 

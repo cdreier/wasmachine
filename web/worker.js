@@ -1,10 +1,10 @@
+self.addEventListener('install', msg => {
+  self.skipWaiting()
+  self.requestBuffer = {}
+})
 self.addEventListener('message', msg => {
 
   switch (msg.data.type) {
-    case "init":
-      self._parent = msg.source
-      self.requestBuffer = {}
-      break;
     case "response":
       // console.log("SW: response", msg.data)
       const res = JSON.parse(msg.data.data)
@@ -39,9 +39,17 @@ const parseBinaryResponse = (res) => {
   return blob
 }
 
+const postMessage = (msg) => {
+  self.clients.matchAll({
+    includeUncontrolled: true
+  }).then(clients => {
+    clients.forEach(c => {
+      c.postMessage(msg)
+    })
+  })
+}
+
 const serializeRequest = async (req, fetchID) => {
-  // TODO: perhaps we need to check the body 
-  // https://developer.mozilla.org/en-US/docs/Web/API/Request#Methods
   const body = await req.arrayBuffer()
   const r = {
     cache: req.cache,
@@ -69,10 +77,10 @@ self.addEventListener('fetch', (event) => {
       new Promise(async resolve => {
         const fetchID = uuidv4()
         const req = await serializeRequest(event.request, fetchID)
-        self._parent.postMessage({
+        postMessage({
           type: "fetch",
           req: req,
-        });
+        })
         self.requestBuffer[fetchID] = {
           done: resolve,
         }
