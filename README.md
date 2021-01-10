@@ -48,7 +48,7 @@ now the strange part... we need to serialize the request, `postMessage` it back 
 js.Global().Get("document").Call("addEventListener", "request", cb)
 ```
 
-Then i stole the idea from the [apex gateway](https://github.com/apex/gateway) - they create golang `http.Request`s from the AWS API Gateway so we can handle lambda requests like normal http requests (this is awesome btw!) - let's take a look at  `cb` - the callback function registered above.
+Then i borrowed the idea from the [apex gateway](https://github.com/apex/gateway) - they create golang `http.Request`s from the AWS API Gateway so we can handle lambda requests like normal http requests (this is awesome btw!) - let's take a look at  `cb` - the callback function registered above.
 
 ```go
 cb := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
