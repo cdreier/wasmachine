@@ -1,6 +1,5 @@
 self.addEventListener('install', msg => {
   self.skipWaiting()
-  self.requestBuffer = {}
 })
 
 addEventListener('activate', event => {
@@ -86,15 +85,24 @@ self.addEventListener('fetch', (event) => {
           type: "fetch",
           req: req,
         })
-        self.requestBuffer[fetchID] = {
-          done: resolve,
-        }
+        addRequestBuffer(fetchID, resolve)
       }).catch(err => console.log(err))
     )
   }
 });
 
-function uuidv4() {
+const addRequestBuffer = (id, done) => {
+  if (!self.requestBuffer) {
+    self.requestBuffer = {}
+  }
+
+  self.requestBuffer[id] = {
+    done,
+  }
+}
+
+
+const uuidv4 = () => {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   );
